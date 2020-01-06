@@ -39,6 +39,11 @@ while True:
     nedeed_workers=count_knights*1.5
     nedeed_knights=count_workers*0.5
     nedeed_factories=int(count_workers/3)
+
+    count_workers=3
+    count_knights=0
+    count_factories=0
+    count_rockets=0
     #print('We need: ', nedeed_rockets, 'rockets in round: ', gc.round())
 
     # frequent try/catches are a good idea
@@ -89,9 +94,9 @@ while True:
                         if other.unit_type == bc.UnitType.Rocket and gc.can_build(unit.id, other.id) and nedeed_rockets>0:
                             gc.build(unit.id, other.id)
                             continue
-                        if gc.can_replicate(unit.id, d) and nedeed_workers>0:
-                            gc.replicate(unit.id, d)
-                            continue
+                        #if gc.can_replicate(unit.id, d) and nedeed_workers>0:
+                        #    gc.replicate(unit.id, d)
+                        #    continue
                     if other.team != my_team and gc.is_attack_ready(unit.id) and gc.can_attack(unit.id, other.id):
                         # print('attacked a thing!')
                         gc.attack(unit.id, other.id)
