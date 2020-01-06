@@ -35,6 +35,9 @@ while True:
         # walk through our units:
         for unit in gc.my_units():
 
+            # pick a random direction:
+            d = random.choice(directions)
+
             # first, factory logic
             if unit.unit_type == bc.UnitType.Factory:
                 garrison = unit.structure_garrison()
@@ -54,10 +57,16 @@ while True:
             if location.is_on_map():
                 nearby = gc.sense_nearby_units(location.map_location(), 2)
                 for other in nearby:
-                    if unit.unit_type == bc.UnitType.Worker and gc.can_build(unit.id, other.id):
-                        gc.build(unit.id, other.id)
-                        # print('built a factory!')
-                        # move onto the next unit
+                    if unit.unit_type == bc.UnitType.Worker:
+                        rand_num=random.randint(0,100)
+                        if rand_num>33:
+                            if gc.can_build(unit.id, other.id):
+                                gc.build(unit.id, other.id)
+                                # print(gc.round(), 'built a factory!')
+                                # move onto the next unit
+                        else:
+                            if gc.can_replicate(unit.id, d):
+                                gc.replicate(unit.id, d)
                         continue
                     if other.team != my_team and gc.is_attack_ready(unit.id) and gc.can_attack(unit.id, other.id):
                         # print('attacked a thing!')
@@ -65,12 +74,13 @@ while True:
                         continue
 
             # okay, there weren't any dudes around
-            # pick a random direction:
-            d = random.choice(directions)
 
             # or, try to build a factory:
             if gc.karbonite() > bc.UnitType.Factory.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Factory, d):
                 gc.blueprint(unit.id, bc.UnitType.Factory, d)
+            # or, try to build a rocket
+            if gc.karbonite() > bc.UnitType.Rocket.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Rocket, d) and gc.round()>450:
+                gc.blueprint(unit.id, bc.UnitType.Rocket, d) 
             # and if that fails, try to move
             elif gc.is_move_ready(unit.id) and gc.can_move(unit.id, d):
                 gc.move_robot(unit.id, d)
