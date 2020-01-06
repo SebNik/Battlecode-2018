@@ -38,7 +38,8 @@ while True:
     nedeed_rockets=int((count_all_robots/8)/2)
     nedeed_workers=count_knights*1.5
     nedeed_knights=count_workers*0.5
-    print('We need: ', nedeed_rockets, 'in round: ', gc.round())
+    nedeed_factories=int(count_workers/3)
+    #print('We need: ', nedeed_rockets, 'rockets in round: ', gc.round())
 
     # frequent try/catches are a good idea
     try:
@@ -47,6 +48,15 @@ while True:
 
             # pick a random direction:
             d = random.choice(directions)
+
+            if unit.unit_type== bc.UnitType.Worker:
+                count_workers+=1
+            if unit.unit_type== bc.UnitType.Knight:
+                count_knights+=1
+            if unit.unit_type== bc.UnitType.Factory:
+                count_factories+=1
+            if unit.unit_type== bc.UnitType.Rocket:
+                count_rockets+=1
 
             # first, factory logic
             if unit.unit_type == bc.UnitType.Factory:
@@ -61,6 +71,11 @@ while True:
                     gc.produce_robot(unit.id, bc.UnitType.Knight)
                     # print('produced a knight!')
                     continue
+                elif gc.can_produce_robot(unit.id, bc.UnitType.Worker) and nedeed_workers>0:
+                    gc.produce_robot(unit.id, bc.UnitType.Worker)
+                    # print('produced a workers!')
+                    continue
+
 
             # first, let's look for nearby blueprints to work on
             location = unit.location
@@ -68,16 +83,15 @@ while True:
                 nearby = gc.sense_nearby_units(location.map_location(), 2)
                 for other in nearby:
                     if unit.unit_type == bc.UnitType.Worker:
-                        if other.unit_type == bc.UnitType.Factory and :
-
-                        if gc.can_build(unit.id, other.id) and :
+                        if other.unit_type == bc.UnitType.Factory and gc.can_build(unit.id, other.id) and nedeed_factories>0:
                             gc.build(unit.id, other.id)
-                            # move onto the next unit
-                        else:
-                            if gc.can_replicate(unit.id, d):
-                                gc.replicate(unit.id, d)
-                                print('replicated with rand_num=', rand_num)
-                        continue
+                            continue
+                        if other.unit_type == bc.UnitType.Rocket and gc.can_build(unit.id, other.id) and nedeed_rockets>0:
+                            gc.build(unit.id, other.id)
+                            continue
+                        if gc.can_replicate(unit.id, d) and nedeed_workers>0:
+                            gc.replicate(unit.id, d)
+                            continue
                     if other.team != my_team and gc.is_attack_ready(unit.id) and gc.can_attack(unit.id, other.id):
                         # print('attacked a thing!')
                         gc.attack(unit.id, other.id)
@@ -86,10 +100,10 @@ while True:
             # okay, there weren't any dudes around
 
             # or, try to build a factory:
-            if gc.karbonite() > bc.UnitType.Factory.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Factory, d):
+            if gc.karbonite() > bc.UnitType.Factory.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Factory, d) and nedeed_factories>0 and gc.round()<500:
                 gc.blueprint(unit.id, bc.UnitType.Factory, d)
             # or, try to build a rocket
-            if gc.karbonite() > bc.UnitType.Rocket.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Rocket, d) and gc.round()>450:
+            if gc.karbonite() > bc.UnitType.Rocket.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Rocket, d) and gc.round()>450 and nedeed_rockets>0:
                 gc.blueprint(unit.id, bc.UnitType.Rocket, d) 
             # and if that fails, try to move
             elif gc.is_move_ready(unit.id) and gc.can_move(unit.id, d):
