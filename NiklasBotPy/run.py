@@ -97,10 +97,11 @@ while True:
                                 continue
                         if len(garrison)>7:
                             mapp = gc.starting_map(bc.Planet(1))
-                            for x in range(0,mapp.height):
-                                for y in range(0,mapp.width):
-                                    if(gc.can_launch_rocket(unit.id,bc.MapLocation(bc.Planet(1),y,x))):
-                                        gc.launch_rocket(unit.id,bc.MapLocation(bc.Planet(1),y,x))
+                            for y in range(0,mapp.height):
+                                for x in range(0,mapp.width):
+                                    if (mapp.is_passable_terrain_at(x,y)):
+                                        if(gc.can_launch_rocket(unit.id,bc.MapLocation(bc.Planet(1),x,y))):
+                                            gc.launch_rocket(unit.id,bc.MapLocation(bc.Planet(1),x,y))
                     if unit.unit_type == bc.UnitType.Worker:
                         for a in directions:
                             if gc.can_harvest(unit.id , a):
