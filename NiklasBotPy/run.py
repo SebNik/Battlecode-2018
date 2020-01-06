@@ -36,7 +36,7 @@ while True:
     #data overview
     count_all_robots=count_knights+count_workers
     nedeed_rockets=int((count_all_robots/8)/2)
-    nedeed_workers=count_knights*1.5
+    nedeed_workers=count_knights*1.7
     nedeed_knights=count_workers*0.5
     nedeed_factories=int(count_workers/3)
 
@@ -44,6 +44,7 @@ while True:
     count_knights=0
     count_factories=0
     count_rockets=0
+
     #print('We need: ', nedeed_rockets, 'rockets in round: ', gc.round())
 
     # frequent try/catches are a good idea
@@ -87,7 +88,17 @@ while True:
             if location.is_on_map():
                 nearby = gc.sense_nearby_units(location.map_location(), 2)
                 for other in nearby:
+                    if unit.unit_type == bc.UnitType.Rocket:
+                        garrison=unit.structure_garrison()
+                        if len(garrison)>0:
+                            print('found a rocket')
+                            if gc.can_load(unit.id, other.id):
+                                print('can load unit')
                     if unit.unit_type == bc.UnitType.Worker:
+                        for a in directions:
+                            if gc.can_harvest(unit.id , a):
+                                gc.harvest(unit.id, a)
+                                #print(gc.karbonite(),'added karbonite')
                         if other.unit_type == bc.UnitType.Factory and gc.can_build(unit.id, other.id) and nedeed_factories>0:
                             gc.build(unit.id, other.id)
                             continue
@@ -108,11 +119,13 @@ while True:
             if gc.karbonite() > bc.UnitType.Factory.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Factory, d) and nedeed_factories>0 and gc.round()<500:
                 gc.blueprint(unit.id, bc.UnitType.Factory, d)
             # or, try to build a rocket
-            if gc.karbonite() > bc.UnitType.Rocket.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Rocket, d) and gc.round()>450 and nedeed_rockets>0:
+            if gc.karbonite() > bc.UnitType.Rocket.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Rocket, d) and gc.round()>350 and nedeed_rockets>0:
                 gc.blueprint(unit.id, bc.UnitType.Rocket, d) 
             # and if that fails, try to move
             elif gc.is_move_ready(unit.id) and gc.can_move(unit.id, d):
                 gc.move_robot(unit.id, d)
+            #print(d)
+            #print(gc.karbonite())
 
     except Exception as e:
         print('Error:', e)
