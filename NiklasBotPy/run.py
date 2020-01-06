@@ -26,9 +26,19 @@ gc.queue_research(bc.UnitType.Knight)
 
 my_team = gc.team()
 
+count_workers=3
+count_knights=0
+count_factories=0
+count_rockets=0
+
 while True:
-    # We only support Python 3, which means brackets around print()
-    # print('pyround:', gc.round(), 'time left:', gc.get_time_left_ms(), 'ms')
+
+    #data overview
+    count_all_robots=count_knights+count_workers
+    nedeed_rockets=int((count_all_robots/8)/2)
+    nedeed_workers=count_knights*1.5
+    nedeed_knights=count_workers*0.5
+    print('We need: ', nedeed_rockets, 'in round: ', gc.round())
 
     # frequent try/catches are a good idea
     try:
@@ -47,7 +57,7 @@ while True:
                         # print('unloaded a knight!')
                         gc.unload(unit.id, d)
                         continue
-                elif gc.can_produce_robot(unit.id, bc.UnitType.Knight):
+                elif gc.can_produce_robot(unit.id, bc.UnitType.Knight) and nedeed_knights>0:
                     gc.produce_robot(unit.id, bc.UnitType.Knight)
                     # print('produced a knight!')
                     continue
@@ -58,15 +68,15 @@ while True:
                 nearby = gc.sense_nearby_units(location.map_location(), 2)
                 for other in nearby:
                     if unit.unit_type == bc.UnitType.Worker:
-                        rand_num=random.randint(0,100)
-                        if rand_num>33:
-                            if gc.can_build(unit.id, other.id):
-                                gc.build(unit.id, other.id)
-                                # print(gc.round(), 'built a factory!')
-                                # move onto the next unit
+                        if other.unit_type == bc.UnitType.Factory and :
+
+                        if gc.can_build(unit.id, other.id) and :
+                            gc.build(unit.id, other.id)
+                            # move onto the next unit
                         else:
                             if gc.can_replicate(unit.id, d):
                                 gc.replicate(unit.id, d)
+                                print('replicated with rand_num=', rand_num)
                         continue
                     if other.team != my_team and gc.is_attack_ready(unit.id) and gc.can_attack(unit.id, other.id):
                         # print('attacked a thing!')
