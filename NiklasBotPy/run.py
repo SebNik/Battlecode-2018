@@ -26,7 +26,7 @@ gc.queue_research(bc.UnitType.Knight)
 
 my_team = gc.team()
 
-count_workers=3
+count_workers=0
 count_knights=0
 count_factories=0
 count_rockets=0
@@ -35,17 +35,22 @@ while True:
 
     #data overview
     count_all_robots=count_knights+count_workers
-    nedeed_rockets=int((count_all_robots/8)/2)
-    nedeed_workers=count_knights*1.7
-    nedeed_knights=count_workers*0.5
-    nedeed_factories=int(count_workers/3)
+    nedeed_rockets=int((count_all_robots/8)/2)-count_rockets
+    nedeed_knights=int(count_workers*0.5-count_knights)
+    nedeed_factories=int(count_workers/3)-count_factories
+    if gc.round()>500:
+        nedeed_workers=gc.karbonite()-(nedeed_factories*200)-(nedeed_knights*40)-(nedeed_rockets*150)
+    else:
+        nedeed_workers=(gc.karbonite()-(nedeed_factories*200)-(nedeed_knights*40))/60
 
-    count_workers=3
+    print('We need: ', nedeed_knights, 'knights in round: ', gc.karbonite(), count_knights)
+    print('We need: ', nedeed_workers, 'workers in round: ', gc.round(), count_workers)
+    print('We need: ', nedeed_factories, 'factories in round: ', gc.round(), count_factories)
+
+    count_workers=0
     count_knights=0
     count_factories=0
     count_rockets=0
-
-    #print('We need: ', nedeed_rockets, 'rockets in round: ', gc.round())
 
     # frequent try/catches are a good idea
     try:
@@ -70,16 +75,17 @@ while True:
                 if len(garrison) > 0:
                     d = random.choice(directions)
                     if gc.can_unload(unit.id, d):
-                        # print('unloaded a knight!')
+                        print('unloaded a knight!')
                         gc.unload(unit.id, d)
-                        continue
-                elif gc.can_produce_robot(unit.id, bc.UnitType.Knight) and nedeed_knights>0:
+                print('kasdjflkasdjkfjl', gc.can_produce_robot(unit.id, bc.UnitType.Knight))
+                gc.produce_robot(unit.id, bc.UnitType.Knight)
+                if (gc.can_produce_robot(unit.id, bc.UnitType.Knight) and nedeed_knights>0):
                     gc.produce_robot(unit.id, bc.UnitType.Knight)
-                    # print('produced a knight!')
+                    print('produced a knight!')
                     continue
                 elif gc.can_produce_robot(unit.id, bc.UnitType.Worker) and nedeed_workers>0:
                     gc.produce_robot(unit.id, bc.UnitType.Worker)
-                    # print('produced a workers!')
+                    print('produced a workers!')
                     continue
 
 
@@ -113,9 +119,9 @@ while True:
                         if other.unit_type == bc.UnitType.Rocket and gc.can_build(unit.id, other.id) and nedeed_rockets>0:
                             gc.build(unit.id, other.id)
                             continue
-                        #if gc.can_replicate(unit.id, d) and nedeed_workers>0:
-                        #    gc.replicate(unit.id, d)
-                        #    continue
+                        if gc.can_replicate(unit.id, d) and nedeed_workers>0 and gc.round()<20:
+                            gc.replicate(unit.id, d)
+                            continue
                     if other.team != my_team and gc.is_attack_ready(unit.id) and gc.can_attack(unit.id, other.id):
                         # print('attacked a thing!')
                         gc.attack(unit.id, other.id)
@@ -124,7 +130,7 @@ while True:
             # okay, there weren't any dudes around
 
             # or, try to build a factory:
-            if gc.karbonite() > bc.UnitType.Factory.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Factory, d) and nedeed_factories>0 and gc.round()<500:
+            if gc.karbonite() > bc.UnitType.Factory.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Factory, d) and nedeed_factories>0 and gc.round()<749:
                 gc.blueprint(unit.id, bc.UnitType.Factory, d)
             # or, try to build a rocket
             if gc.karbonite() > bc.UnitType.Rocket.blueprint_cost() and gc.can_blueprint(unit.id, bc.UnitType.Rocket, d) and gc.round()>350 and nedeed_rockets>0:
