@@ -75,17 +75,15 @@ while True:
                 if len(garrison) > 0:
                     d = random.choice(directions)
                     if gc.can_unload(unit.id, d):
-                        print('unloaded a knight!')
+                        # print('unloaded a knight!')
                         gc.unload(unit.id, d)
-                print('kasdjflkasdjkfjl', gc.can_produce_robot(unit.id, bc.UnitType.Knight))
-                gc.produce_robot(unit.id, bc.UnitType.Knight)
-                if (gc.can_produce_robot(unit.id, bc.UnitType.Knight) and nedeed_knights>0):
+                if gc.can_produce_robot(unit.id, bc.UnitType.Knight) and nedeed_knights>0:
                     gc.produce_robot(unit.id, bc.UnitType.Knight)
-                    print('produced a knight!')
+                    # print('produced a knight!')
                     continue
                 elif gc.can_produce_robot(unit.id, bc.UnitType.Worker) and nedeed_workers>0:
                     gc.produce_robot(unit.id, bc.UnitType.Worker)
-                    print('produced a workers!')
+                    # print('produced a workers!')
                     continue
 
 
